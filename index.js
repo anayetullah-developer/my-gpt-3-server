@@ -21,18 +21,27 @@ app.post("/chat", async (req, res) => {
     if (prompt == null) {
       throw new Error("Uh oh, no prompt was provided");
     }
-    const response = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt: prompt,
-      max_tokens: 512,
-      temperature: 0,
-
+    const completion = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo-16k",
+      messages: [
+        {
+          "role": "user",
+          "content": `${prompt}`
+        }
+      ],
+      temperature: 1,
+      max_tokens: 256,
+      top_p: 1,
+      frequency_penalty: 0,
+      presence_penalty: 0,
     });
-    const completion = response.data.choices[0].text;
+
+    const response = completion.data.choices[0].message.content;
     return res.status(200).json({
       success: true,
-      message: completion,
+      message: response,
     });
+    console.log();
   } catch (error) {
     console.log(error.message);
   }
